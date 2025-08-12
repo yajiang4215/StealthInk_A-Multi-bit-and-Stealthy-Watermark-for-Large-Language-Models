@@ -2,4 +2,10 @@
 
 ## https://arxiv.org/abs/2506.05502
 
-<pre> ```bibtex @article{jiang2025stealthink, title = {StealthInk: A Multi-bit and Stealthy Watermark for Large Language Models}, author = {Ya Jiang, Chuxiong Wu, Massieh Kordi Boroujeny, Brian Mark, Kai Zeng}, journal = {{ICML}}, year = {2025} } ``` </pre>
+```bibtex
+@inproceedings{jiang2025stealthink,
+  title   = {StealthInk: A Multi-bit and Stealthy Watermark for Large Language Models},
+  author  = {Jiang, Ya and Wu, Chuxiong and Kordi Boroujeny, Massieh and Mark, Brian and Zeng, Kai},
+  booktitle = {Proceedings of the 42nd International Conference on Machine Learning},
+  year    = {2025}
+}
