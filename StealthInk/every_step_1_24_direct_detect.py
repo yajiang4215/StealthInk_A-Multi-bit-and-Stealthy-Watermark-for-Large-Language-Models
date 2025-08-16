@@ -117,6 +117,12 @@ def parse_args():
         help="number of tokens in each response.",
     )
     parser.add_argument(
+        "--prompts_fp",
+        type=str,
+        default="prompts.json",
+        help="directory to store responses.",
+    )
+    parser.add_argument(
         "--out_dir",
         type=str,
         default="output",
@@ -676,6 +682,7 @@ def main(
     msg_len,
     generation_length,
     n_gram_len,
+    prompts_fp,
     out_dir,
 ):
     """
@@ -713,7 +720,7 @@ def main(
     out_json_path = os.path.join(out_dir, f"c{capacity}_{msg_len}_res{start+1}_{start+generation_num}_1000.json")
 
     # load {generation_num} prompts
-    prompts = load_prompts(json_path='/projects/kzeng2/c4_subset_10000_15_20words_prompts.json', nsamples=generation_num)
+    prompts = load_prompts(json_path=promts_fp, nsamples=generation_num)
     with open(out_json_path, "a", encoding="utf-8") as fw_wm:
         for i in range(start, start + generation_num):
             t1 = time.time()
@@ -798,6 +805,7 @@ if __name__ == "__main__":
     generation_num = args.generation_num  # generate 400 responses
     generation_length = args.generation_length # number of tokens in each response
     out_dir = args.out_dir # directory to store responses
+    prompts_fp = args.prompts_fp
     
     temp = args.sampling_temp # temperature
     n_gram_len = 3 # length of seed
@@ -813,6 +821,7 @@ if __name__ == "__main__":
         generation_length=generation_length,
         n_gram_len=n_gram_len,
         out_dir=out_dir
+        prompts_fp=prompts_fp
     )
     e = time.time()
     print("total hours:", (e - s) / 3600.0)
