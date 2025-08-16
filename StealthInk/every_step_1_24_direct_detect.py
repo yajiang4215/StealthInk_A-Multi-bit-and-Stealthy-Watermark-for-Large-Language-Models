@@ -792,7 +792,7 @@ if __name__ == "__main__":
     # torch.set_grad_enabled(False)
 
     args = parse_args()
-    capacity = args.capacity        # bits per symbol
+    capacity = args.chunk_capacity        # bits per symbol
     msg_len = args.msg_len        # total embedded bits
     start = args.start           # start index of prompts file
     generation_num = args.generation_num  # generate 400 responses
@@ -801,7 +801,6 @@ if __name__ == "__main__":
     
     temp = args.sampling_temp # temperature
     n_gram_len = 3 # length of seed
-    
 
     s = time.time()
     main(
