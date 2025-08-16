@@ -107,19 +107,19 @@ def parse_args():
     parser.add_argument(
         "--generation_num",
         type=int,
-        default=400,
-        help="generate 400 responses.",
+        default=500,
+        help="generate 500 responses.",
     )
     parser.add_argument(
         "--generation_length",
         type=int,
-        default=200,
+        default=300,
         help="number of tokens in each response.",
     )
     parser.add_argument(
         "--prompts_fp",
         type=str,
-        default="prompts.json",
+        default=""c4_subset_10000_15_20words_prompts.json"",
         help="directory to store responses.",
     )
     parser.add_argument(
