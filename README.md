@@ -6,7 +6,7 @@
 
 Generate 400 responses for 400 prompts. For each response, embed 24 bits in 200 tokens and do detection and decoding for the watermark.
 
-```python3 every_step_1_24_direct_detect.py --model_name_or_path "meta-llama/Llama-2-7b-hf" --chunk_capacity 1 --msg_len 24 --start 0 --generation_num 400 --generation_length 200 --prompts_fp "c4_subset_10000_15_20words_prompts.json" --out_dir "output" --sampling_temp 1.0 ```
+```python3 every_step_1_24_direct_detect.py --model_name_or_path "meta-llama/Llama-2-7b-hf" --chunk_capacity 1 --msg_len 24 --start 0 --generation_num 500 --generation_length 300 --prompts_fp "c4_subset_10000_15_20words_prompts.json" --out_dir "output" --sampling_temp 1.0 ```
 
 capacity: bits per symbol
 
