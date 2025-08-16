@@ -33,7 +33,7 @@ class WatermarkBase:
     def __init__(
         self,
         vocab = None,
-        seeding_scheme = "simple_3",  # mostly unused/always default
+        seeding_scheme = "simple_3",  # length of seed is 3
         hash_key = 15485863,  # just a large prime number to create a rng seed with sufficient bit width
     ):
 
@@ -48,71 +48,19 @@ class WatermarkBase:
         # can optionally override the seeding scheme,
         # but uses the instance attr by default
         # print("seeding scheme:", self.seeding_scheme)
-        self.rng = torch.Generator(device=input_ids.device)
+        # self.rng = torch.Generator(device=input_ids.device)
+        self.rng = torch.Generator(device='cpu') # can also do it on device=input_ids.device (gpu), but needs to guarantee the generation and detection are on the same gpu device
         if seeding_scheme is None:
             seeding_scheme = self.seeding_scheme
-        if seeding_scheme == "simple_1":
+        if seeding_scheme == "simple_1": # length of seed is 1
             assert input_ids.shape[-1] >= 1, f"seeding_scheme={seeding_scheme} requires at least a 1 token prefix sequence to seed rng"
             self.prf_type, self.context_width, self.self_salt, self.hash_key = seeding_scheme_lookup(seeding_scheme)
             prf_key = prf_lookup[self.prf_type](input_ids[-1:], salt_key=self.hash_key)
             # enable for long, interesting streams of pseudorandom numbers: print(prf_key)
             self.rng.manual_seed(prf_key % (2**64 - 1))  # safeguard against overflow from long
-        elif seeding_scheme == "simple_3":
+        elif seeding_scheme == "simple_3": # length of seed is 3
             assert input_ids.shape[-1] >= 3, f"seeding_scheme={seeding_scheme} requires at least a 3 token prefix sequence to seed rng"
             self.prf_type, self.context_width, self.self_salt, self.hash_key = seeding_scheme_lookup(seeding_scheme)
-            
             prf_key = prf_lookup[self.prf_type](input_ids[:, -3:], salt_key=self.hash_key)
-            # print("input_ids[-3:]:", input_ids[:, -3:], prf_key)
-            self.rng.manual_seed(prf_key % (2**64 - 1))  # safeguard against overflow from long
-            # torch.manual_seed(prf_key % (2**64 - 1))
+            self.rng.manual_seed(prf_key % (2**64 - 1)) 
         return
-
-
-
-class WatermarkDetector(WatermarkBase):
-    def __init__(
-        self,
-        *args,
-        device: torch.device = 'cuda:0',
-        tokenizer: Tokenizer = None,
-        z_threshold: float = 4.0,
-        normalizers: list[str] = ["unicode"],  # or also: ["unicode", "homoglyphs", "truecase"]
-        ignore_repeated_bigrams: bool = True,
-        **kwargs,
-    ):
-        super().__init__(*args, **kwargs)
-        # also configure the metrics returned/preprocessing options
-        assert device, "Must pass device"
-        assert tokenizer, "Need an instance of the generating tokenizer to perform detection"
-
-        self.tokenizer = tokenizer
-        self.device = device
-        self.z_threshold = z_threshold
-
-        if self.seeding_scheme == "simple_1":
-            self.min_prefix_len = 1
-        elif self.seeding_scheme == "simple_3":
-            self.min_prefix_len = 3
-
-        self.normalizers = []
-        for normalization_strategy in normalizers:
-            self.normalizers.append(normalization_strategy_lookup(normalization_strategy))
-
-        self.ignore_repeated_bigrams = ignore_repeated_bigrams
-        if self.ignore_repeated_bigrams:
-            assert self.seeding_scheme == "simple_1", "No repeated bigram credit variant assumes the single token seeding scheme."
-
-    def _compute_p_value(self, z):
-        p_value = 1-scipy.stats.norm.sf(z)
-        return p_value
-
-
-    def hamming_distance(self, bit_str1, bit_str2):
-        if len(bit_str1) != len(bit_str2):
-            raise ValueError("The input strings must have the same length.")
-        distance = 0
-        for char1, char2 in zip(bit_str1, bit_str2):
-            if char1 != char2:
-                distance += 1
-
-        return distance
