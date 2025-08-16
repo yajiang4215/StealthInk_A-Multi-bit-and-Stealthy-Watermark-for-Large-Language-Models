@@ -87,6 +87,42 @@ def parse_args():
         help="Sampling temperature (when --use_sampling=True).",
     )
     parser.add_argument(
+        "--chunk_capacity",
+        type=int,
+        default=1,
+        help="bits per chunk.",
+    )
+    parser.add_argument(
+        "--msg_len",
+        type=int,
+        default=24,
+        help="total embedded bits.",
+    )
+    parser.add_argument(
+        "--start",
+        type=int,
+        default=0,
+        help="start index of prompts file.",
+    )
+    parser.add_argument(
+        "--generation_num",
+        type=int,
+        default=400,
+        help="generate 400 responses.",
+    )
+    parser.add_argument(
+        "--generation_length",
+        type=int,
+        default=200,
+        help="number of tokens in each response.",
+    )
+    parser.add_argument(
+        "--out_dir",
+        type=str,
+        default="output",
+        help="directory to store responses.",
+    )
+    parser.add_argument(
         "--n_beams",
         type=int,
         default=1,
@@ -666,7 +702,7 @@ def main(
     reweight_processor = ReweightProcessor(vocab=vocab) # for reweight function
     detector_processor = DetectorProcessor(vocab=vocab) # for detection
 
-    length_candi = np.arange(50, 250, 50)  # the length of tokens for detection, eg., [50,100,150,200]
+    length_candi = np.arange(50, generation_length+50, 50)  # the length of tokens for detection, eg., [50,100,150,200]
     # record the results (p values, number of correct bits) for each generation length in length_candi
     nonwm_pvals_dict = {L: [] for L in length_candi}
     wm_pvals_dict = {L: [] for L in length_candi}
@@ -751,19 +787,21 @@ def main(
 
 
 if __name__ == "__main__":
-    torch.backends.cuda.matmul.allow_tf32 = True
-    torch.backends.cudnn.allow_tf32 = True
-    torch.set_grad_enabled(False)
+    # torch.backends.cuda.matmul.allow_tf32 = True
+    # torch.backends.cudnn.allow_tf32 = True
+    # torch.set_grad_enabled(False)
 
     args = parse_args()
-    capacity = 1        # bits per symbol
-    msg_len = 24        # total embedded bits
-    start = 0           # start index of prompts file
-    generation_num = 400  # generate 400 responses
-    generation_length = 200 # number of tokens in each response
-    temp = 1 # temperature
+    capacity = args.capacity        # bits per symbol
+    msg_len = args.msg_len        # total embedded bits
+    start = args.start           # start index of prompts file
+    generation_num = args.generation_num  # generate 400 responses
+    generation_length = args.generation_length # number of tokens in each response
+    out_dir = args.out_dir # directory to store responses
+    
+    temp = args.sampling_temp # temperature
     n_gram_len = 3 # length of seed
-    out_dir = "output" # directory to store responses
+    
 
     s = time.time()
     main(
