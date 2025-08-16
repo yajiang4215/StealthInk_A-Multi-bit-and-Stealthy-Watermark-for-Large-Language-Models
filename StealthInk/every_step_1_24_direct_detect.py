@@ -144,6 +144,9 @@ class ReweightProcessor(WatermarkBase):
         super().__init__(*args, **kwargs)
 
     def reweight(self, seed, original_token_probs, pos_embedded_message, base): 
+        """
+        implementing reweight function as fig. 2 in paper
+        """
         self._seed_rng(seed)
         vocab_perm = torch.randperm(self.vocab_size, device='cpu', generator=self.rng).detach().cpu().tolist()
         colorlist = torch.chunk(torch.tensor(vocab_perm), base)
