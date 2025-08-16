@@ -1,7 +1,14 @@
 # Codes for paper StealthInk: A Multi-bit and Stealthy Watermark for Large Language Models (ICML 2025)
 
-## https://arxiv.org/abs/2506.05502
+## Link: https://arxiv.org/abs/2506.05502
 
+## Usage
+
+Generate 400 responses for 400 prompts. For each response, embed 24 bits in 200 tokens and do detection and decoding for the watermark.
+
+```python3 every_step_1_24_direct_detect.py --chunk_capacity 1 --msg_len 24 --start 0 --generation_num 400 --generation_length 200 --out_dir "output" --sampling_temp 1.0 ```
+
+## Citation
 ```bibtex
 @inproceedings{jiang2025stealthink,
   title   = {StealthInk: A Multi-bit and Stealthy Watermark for Large Language Models},
